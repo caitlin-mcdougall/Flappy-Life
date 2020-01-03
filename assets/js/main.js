@@ -4,6 +4,7 @@ var player;
 var pipe;
 var pipes = [];
 
+
 var SCREENWIDTH;
 var SCREENHEIGHT;
 var PLAYERWIDTH = 20;
@@ -13,6 +14,11 @@ var screenX = 10;
 var screenY = 10;
 var playerX = 40;
 var playerY = 40;
+
+var pipeX;
+var pipeY = 10;
+var pipeHeight;
+var pipeWidth = 30;
 
 var playerSpeed=1;
 var jump = false;
@@ -27,17 +33,21 @@ var edgeCheckInterval;
 var MINGAP = 80;
 
 function startScreen(){
-    if (start){
-        init();
-    }
-    
+    canvas = document.getElementById('gameCanvas');
+    gameScreen = canvas.getContext('2d');
+    SCREENHEIGHT = canvas.height;
+    SCREENWIDTH = canvas.width;
+    var txt = canvas.getContext('2d');
+    gameScreen.fillStyle = "lightblue";
+    gameScreen.fillRect(screenX, screenY, SCREENWIDTH, SCREENHEIGHT);
+    txt.font = "30px Arial";
+    txt.fillStyle = "red";
+    txt.textAlign = "center";
+    txt.fillText("Flappy Life", SCREENWIDTH/2,SCREENHEIGHT/2);
+;    
 }
 
 function init(){
-    canvas = document.getElementById('gameCanvas');
-    SCREENHEIGHT = canvas.height;
-    SCREENWIDTH = canvas.width;
-    gameScreen = canvas.getContext('2d');
     
     
     player = canvas.getContext('2d');
@@ -45,10 +55,10 @@ function init(){
 
     pipeInterval = setInterval(spawnPipe, 2300);
     pipeMoveInterval = setInterval(pipeMove,100);
-    moveInterval = setInterval(playerMove, 100); 
+    moveInterval = setInterval(playerMove, 101); 
     drawInterval = setInterval(redraw, 100);
     edgeCheckInterval = setInterval(pipeAtEdge, 100);
-    endCheckInterval = setInterval(isEnd, 50);
+    endCheckInterval = setInterval(isEnd, 80);
 
     document.onkeydown = playerJump;
 
@@ -75,6 +85,7 @@ function redraw(){
 function reset(){
     playerX = 40;
     playerY = 40;
+    pipes = []; 
     redraw();  
 }
 
@@ -102,10 +113,10 @@ function pipeMove(){
 }
 
 function spawnPipe(){
-    var pipeX = SCREENWIDTH;
-    var pipeY = 10;
-    var pipeHeight;
-    var pipeWidth = 30;
+    pipeX = SCREENWIDTH;
+    pipeY = 10;
+    pipeHeight;
+    pipeWidth = 30;
 
     pipeHeight = Math.floor(Math.random() * (SCREENHEIGHT-(MINGAP*2) + MINGAP+10));
     pipes.push([pipeX, pipeY, pipeWidth, pipeHeight]);
@@ -122,12 +133,17 @@ function pipeAtEdge(){
 }
 
 function isEnd(){
-    var end;
+    var end =false;
     if (playerY > SCREENHEIGHT + screenY){
         end = true;
     }
     else{
-        end = false;
+        pipes.forEach(p => {
+            if(!(playerX + PLAYERWIDTH  < p[0] || playerX > p[0] + p[2] || playerY + PLAYERHEIGHT < p[1] || playerY > p[1] + p[3])){
+                end = true;
+            }
+        })
+        
     }
     
     if (end){
