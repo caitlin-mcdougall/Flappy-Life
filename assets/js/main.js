@@ -4,6 +4,13 @@ var player;
 var pipe;
 var pipes = [];
 
+var button ={
+    x:0,
+    y:0,
+    width: 100,
+    height: 80
+};
+
 
 var SCREENWIDTH;
 var SCREENHEIGHT;
@@ -22,7 +29,7 @@ var pipeWidth = 30;
 
 var playerSpeed=1;
 var jump = false;
-var start = true;
+
 
 var pipeMoveInterval;
 var moveInterval;
@@ -30,21 +37,43 @@ var drawInterval;
 var edgeCheckInterval;
 var edgeCheckInterval;
 
+
 var MINGAP = 80;
+
 
 function startScreen(){
     canvas = document.getElementById('gameCanvas');
     gameScreen = canvas.getContext('2d');
     SCREENHEIGHT = canvas.height;
     SCREENWIDTH = canvas.width;
-    var txt = canvas.getContext('2d');
     gameScreen.fillStyle = "lightblue";
     gameScreen.fillRect(screenX, screenY, SCREENWIDTH, SCREENHEIGHT);
-    txt.font = "30px Arial";
-    txt.fillStyle = "red";
+
+    var txt = canvas.getContext('2d');
+    txt.font = "40px Gothic";
+    txt.fillStyle = "darkgreen";
     txt.textAlign = "center";
     txt.fillText("Flappy Life", SCREENWIDTH/2,SCREENHEIGHT/2);
-;    
+
+    var butt = canvas.getContext('2d');
+    butt.fillStyle = "yellow";
+    butt.fillRect(SCREENWIDTH/2-100/2, SCREENHEIGHT/2 + 50, 100, 80);
+    button.x = SCREENWIDTH/2-100/2
+    button.y = SCREENHEIGHT/2 + 50;
+    butt.textAlign = "center";
+    butt.font = "30px Gothic"
+    butt.fillStyle = "red";
+    butt.fillText("Start", SCREENWIDTH/2, SCREENHEIGHT/2 + 100);
+    canvas.addEventListener('click', function(evt){
+        
+        var mousePosition = getMousePosition(canvas, evt);
+        if (isIntersecting(mousePosition, button)){
+            init();
+        }
+        
+    }, false);
+    
+  
 }
 
 function init(){
@@ -59,11 +88,22 @@ function init(){
     drawInterval = setInterval(redraw, 100);
     edgeCheckInterval = setInterval(pipeAtEdge, 100);
     endCheckInterval = setInterval(isEnd, 80);
-
     document.onkeydown = playerJump;
+
 
 }
 
+function getMousePosition(canvas, event){
+    var button = canvas.getBoundingClientRect();
+    return {
+        x: event.clientX - button.left,
+        y: event.clientY - button.top
+    };
+}
+
+function isIntersecting(mousePos, button){
+    return mousePos.x > button.x && mousePos.x < button.x+button.width && mousePos.y < button.y+button.height && mousePos.y > button.y
+}
 function clear(c) {
     c.clearRect(0,0, SCREENWIDTH, SCREENHEIGHT);
 }
@@ -85,8 +125,8 @@ function redraw(){
 function reset(){
     playerX = 40;
     playerY = 40;
-    pipes = []; 
-    redraw();  
+    playerSpeed = 1;
+    pipes = [];   
 }
 
 function playerJump(e){
@@ -147,15 +187,15 @@ function isEnd(){
     }
     
     if (end){
-        alert("game ended");
         clearInterval(drawInterval);
-        clearInterval(edgeCheckInterval);
+        clearInterval(pipeInterval);
         clearInterval(edgeCheckInterval);
         clearInterval(moveInterval);
         clearInterval(pipeMoveInterval);
-        start = false;
+        clearInterval(endCheckInterval);
         reset();
-        startScreen();
+        location.reload();
     }
+    return;
 }
 
