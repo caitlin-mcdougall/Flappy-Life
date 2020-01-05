@@ -40,6 +40,7 @@ var edgeCheckInterval;
 
 var MINGAP = 80;
 
+var score = 0;
 
 function startScreen(){
     canvas = document.getElementById('gameCanvas');
@@ -54,6 +55,11 @@ function startScreen(){
     txt.fillStyle = "darkgreen";
     txt.textAlign = "center";
     txt.fillText("Flappy Life", SCREENWIDTH/2,SCREENHEIGHT/2);
+    gameScreen.fillStyle="red";
+    gameScreen.font="20px Heletiva";
+    var scorestr = "Score: " + score;
+    gameScreen.textAlign="center";
+    gameScreen.fillText(scorestr, SCREENWIDTH/2, 40);
 
     var butt = canvas.getContext('2d');
     butt.fillStyle = "yellow";
@@ -68,6 +74,7 @@ function startScreen(){
         
         var mousePosition = getMousePosition(canvas, evt);
         if (isIntersecting(mousePosition, button)){
+            reset();
             init();
         }
         
@@ -81,8 +88,8 @@ function init(){
     
     player = canvas.getContext('2d');
     pipe = canvas.getContext('2d');
-
-    pipeInterval = setInterval(spawnPipe, 2300);
+    spawnPipe();
+    pipeInterval = setInterval(spawnPipe, 3000);
     pipeMoveInterval = setInterval(pipeMove,100);
     moveInterval = setInterval(playerMove, 101); 
     drawInterval = setInterval(redraw, 100);
@@ -114,19 +121,26 @@ function redraw(){
     clear(pipe);
     gameScreen.fillStyle="lightblue";
     gameScreen.fillRect(screenX,screenY,SCREENWIDTH,SCREENHEIGHT);
+    
     player.fillStyle="yellow";
     player.fillRect(playerX, playerY, PLAYERWIDTH,PLAYERHEIGHT);
     pipe.fillStyle="green";
     pipes.forEach(p => {
         pipe.fillRect(p[0], p[1], p[2], p[3]);
     })
+    gameScreen.fillStyle="red";
+    gameScreen.font="20px Heletiva";
+    var scorestr = "Score: " + score;
+    gameScreen.textAlign="center";
+    gameScreen.fillText(scorestr, SCREENWIDTH/2, 40);
 }
 
 function reset(){
     playerX = 40;
     playerY = 40;
     playerSpeed = 1;
-    pipes = [];   
+    pipes = [];  
+    score = 0; 
 }
 
 function playerJump(e){
@@ -163,7 +177,7 @@ function spawnPipe(){
     var bottomPipeY = pipeY + pipeHeight +MINGAP;
     var bottompipeHeight = SCREENHEIGHT - bottomPipeY;
     pipes.push([pipeX, bottomPipeY, pipeWidth, bottompipeHeight]);
-
+    score+=1;
 }
 
 function pipeAtEdge(){
@@ -193,7 +207,6 @@ function isEnd(){
         clearInterval(moveInterval);
         clearInterval(pipeMoveInterval);
         clearInterval(endCheckInterval);
-        reset();
         location.reload();
     }
     return;
